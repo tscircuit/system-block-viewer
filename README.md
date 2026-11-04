@@ -26,3 +26,18 @@ Give the container a height, or place it inside a parent with a defined height.
 
 Development: `bun install`, `bun start`, `bun test`, `bun run typecheck`,
 `bun run build`, and `bun run build:site`.
+
+## Hosting and releases
+
+Vercel builds the Cosmos examples with `bun run build:site` and serves
+`cosmos-export`. The connected GitHub project deploys `main` to production and
+creates a preview deployment for pull requests.
+
+The release workflow runs `bun pver release` on `main`, publishes to GitHub
+Packages, and checks the public package metadata and tarball through jscdn.
+The workflow uses its GitHub token with `contents: write` and `packages: write`;
+no npm token is required. Dependencies are installed before the scoped GitHub
+Packages registry is configured.
+
+Install a released version from:
+`https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/VERSION.tgz`.

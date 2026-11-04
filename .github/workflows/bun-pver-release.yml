@@ -1,12 +1,14 @@
-name: Publish to npm
+name: Publish to GitHub Packages
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
   contents: write
-  id-token: write
-  pull-requests: write
+  packages: write
+concurrency:
+  group: package-release
+  cancel-in-progress: false
 jobs:
   publish:
     if: ${{ !(github.event_name == 'push' && startsWith(github.event.head_commit.message, 'v')) }}
@@ -14,17 +16,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
+      # Install public dependencies before configuring the scoped publish registry.
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun test
+      - run: bun run build
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://npm.pkg.github.com
+          scope: "@tscircuit"
           package-manager-cache: false
-      - run: npm install -g pver
-      - run: bun install --frozen-lockfile
-      - run: bun test
-      - run: bun run build
-      - run: pver release
+      - name: Release with pver
+        run: bun pver release
         env:
-          GITHUB_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify public CDN package
+        run: |
+          VERSION=$(bun -p "require('./package.json').version")
+          PACKAGE_URL="https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/$VERSION"
+          curl --fail --retry 12 --retry-all-errors --retry-delay 10 "$PACKAGE_URL/package.json" -o /tmp/published-package.json
+          curl --fail --retry 12 --retry-all-errors --retry-delay 10 "$PACKAGE_URL.tgz" -o /tmp/system-block-viewer.tgz
+          bun -e 'const local = require("./package.json"); const published = require("/tmp/published-package.json"); if (published.name !== local.name || published.version !== local.version) throw new Error("CDN package mismatch")'
+          printf 'Released @tscircuit/system-block-viewer@%s\n\n%s.tgz\n' "$VERSION" "$PACKAGE_URL" >> "$GITHUB_STEP_SUMMARY"

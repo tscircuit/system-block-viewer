@@ -51,9 +51,10 @@
     "react-cosmos-plugin-vite": "^6.2.0",
     "tsup": "^8.3.5",
     "typescript": "^5.9.2",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "pver": "0.0.43"
   },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com"
   }
 }
