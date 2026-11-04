@@ -43,3 +43,24 @@ Packages registry is configured.
 
 Install a released version from:
 `https://jscdn.tscircuit.com/@tscircuit/system-block-viewer/VERSION.tgz`.
+
+Click or tap a block or group to inspect its associated components. The details
+show each component's reference designator and manufacturer part number. PCB
+subcircuit links include nested groups; an explicit component selection remains
+limited to those components.
+
+Pass `onComponentClick` to make component rows actionable:
+
+```tsx
+<SystemBlockViewer
+  circuitJson={circuitJson}
+  onComponentClick={({ source_component_id, refdes }) => {
+    // Navigate to this source component in your application's schematic viewer.
+    console.log(source_component_id, refdes)
+  }}
+/>
+```
+
+The callback receives `source_component_id`, `pcb_component_id`, `refdes`, and
+optional `manufacturer_part_number`. Without a callback, the list is read-only.
+Blocks can also be opened with Enter or Space and details closed with Escape.
