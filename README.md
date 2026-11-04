@@ -2,6 +2,8 @@
 
 A React viewer for resolved system block diagrams in Circuit JSON.
 
+[Live examples](https://system-block-viewer.vercel.app)
+
 ```tsx
 import { SystemBlockViewer } from "@tscircuit/system-block-viewer"
 
