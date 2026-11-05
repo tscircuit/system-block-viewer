@@ -30,8 +30,8 @@
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",
-    "circuit-json": ">=0.0.544",
-    "circuit-to-svg": ">=0.0.456"
+    "circuit-json": "*",
+    "circuit-to-svg": "*"
   },
   "dependencies": {
     "transformation-matrix": "^3.0.0",
