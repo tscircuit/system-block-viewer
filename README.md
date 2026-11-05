@@ -23,6 +23,12 @@ The page selector appears when Circuit JSON contains more than one system
 page. Rendering uses `circuit-to-svg` and the resolved positions, dimensions,
 and routes; the viewer does not perform layout.
 
+`circuit-to-svg` and `circuit-json` are peer dependencies with `"*"` ranges,
+following the tscircuit convention. Install them in the host application alongside this viewer. The
+published viewer imports the host renderer, so RunFrame and the viewer share
+the same version, including support for curved routes. They are also development
+dependencies here for the standalone examples and tests.
+
 Props: `circuitJson` (required), `containerStyle`, and `className`.
 Give the container a height, or place it inside a parent with a defined height.
 
