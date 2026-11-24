@@ -157,3 +157,42 @@ test("block taps and keyboard selection show refdes/MPN; actions are opt-in and 
     await cleanup()
   }
 })
+
+test("releasing over a block does not select it when the press started outside", async () => {
+  const { root, cleanup } = setup()
+  try {
+    await act(async () => root.render(<SystemBlockViewer circuitJson={json} />))
+    const viewport = document.querySelector(
+      '[aria-label="System diagram viewport"]',
+    )!
+    const target = document.querySelector(
+      '[aria-label="Show components for Environment sensor"]',
+    )!
+    const panel = () =>
+      document.querySelector('[aria-label="Associated components"]')
+    const pointer = async (element: Element, type: string) => {
+      const event = new MouseEvent(type, {
+        bubbles: true,
+        clientX: 10,
+        clientY: 10,
+      })
+      Object.defineProperties(event, {
+        pointerId: { value: 1 },
+        isPrimary: { value: true },
+      })
+      await act(async () => {
+        element.dispatchEvent(event)
+      })
+    }
+
+    await pointer(viewport, "pointerdown")
+    await pointer(target, "pointerup")
+    expect(panel()).toBeNull()
+
+    await pointer(target, "pointerdown")
+    await pointer(target, "pointerup")
+    expect(panel()).not.toBeNull()
+  } finally {
+    await cleanup()
+  }
+})

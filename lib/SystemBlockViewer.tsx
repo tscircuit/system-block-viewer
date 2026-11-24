@@ -159,6 +159,7 @@ function SystemViewport({
     x: number
     y: number
     id: number
+    blockId?: string
     moved: boolean
   } | null>(null)
 
@@ -174,10 +175,15 @@ function SystemViewport({
             if (gesture.current) gesture.current.moved = true
             return
           }
+          const target = event.target as Element
           gesture.current = {
             x: event.clientX,
             y: event.clientY,
             id: event.pointerId,
+            blockId:
+              target
+                .closest?.("[data-system-block-id]")
+                ?.getAttribute("data-system-block-id") ?? undefined,
             moved: false,
           }
         }}
@@ -273,6 +279,7 @@ function SystemViewport({
                   if (
                     start &&
                     start.id === event.pointerId &&
+                    start.blockId === id &&
                     !start.moved &&
                     Math.hypot(
                       event.clientX - start.x,
